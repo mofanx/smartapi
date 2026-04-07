@@ -1,0 +1,7 @@
+# 开发环境配置
+name: "dev"
+base_url: "https://httpbin.org"
+variables:
+  env_name: "development"
+  debug: true
+  timeout: 30

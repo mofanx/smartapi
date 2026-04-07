@@ -1,0 +1,26 @@
+# ============================================
+# 示例01：Hello World - 最简单的 GET 请求
+# 学习目标：了解用例基本结构
+# ============================================
+name: "Hello World"
+description: "最简单的 GET 请求测试"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - beginner
+
+steps:
+  - name: "发送 GET 请求"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        hello: "world"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.args.hello"
+        operator: eq
+        expected: "world"

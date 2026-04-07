@@ -1,0 +1,55 @@
+# ============================================
+# 示例05：动态变量与内置函数
+# 学习目标：掌握 ${函数()} 动态变量生成
+# ============================================
+name: "动态变量演示"
+description: "展示 timestamp/uuid/random_*/md5 等内置函数"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - variables
+
+variables:
+  # 用例级别使用动态函数
+  trace_id: "${uuid()}"
+  order_no: "ORD-${timestamp()}-${random_int()}"
+
+steps:
+  - name: "动态变量请求"
+    request:
+      method: POST
+      url: "/post"
+      headers:
+        X-Trace-Id: "${trace_id}"
+        X-Request-Time: "${now()}"
+      body:
+        order_no: "${order_no}"
+        user_name: "${random_name()}"
+        user_phone: "${random_phone()}"
+        user_email: "${random_email()}"
+        request_id: "${uuid()}"
+        timestamp: "${timestamp()}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+
+      # 验证动态值被正确发送（非空即可）
+      - target: body
+        expression: "$.json.order_no"
+        operator: starts_with
+        expected: "ORD-"
+
+      - target: body
+        expression: "$.json.request_id"
+        operator: is_not_null
+
+      - target: body
+        expression: "$.json.user_email"
+        operator: contains
+        expected: "@"
+
+      # Trace ID 应该在 Header 中
+      - target: body
+        expression: "$.headers.X-Trace-Id"
+        operator: is_not_null

@@ -1,0 +1,144 @@
+# ============================================
+# 示例03：断言运算符大全
+# 学习目标：掌握所有断言类型和运算符
+# ============================================
+name: "断言运算符演示"
+description: "展示 15+ 种断言运算符的用法"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - assertions
+
+steps:
+  - name: "丰富断言验证"
+    request:
+      method: POST
+      url: "/post"
+      headers:
+        Content-Type: "application/json"
+      body:
+        name: "SmartAPI-Test"
+        version: 1
+        price: 99.9
+        active: true
+        items: ["apple", "banana", "cherry"]
+        author: null
+        nested:
+          key: "value"
+          url: "https://example.com/api"
+    asserts:
+      # ── eq: 等于 ──
+      - target: status_code
+        operator: eq
+        expected: 200
+
+      # ── neq: 不等于 ──
+      - target: status_code
+        operator: neq
+        expected: 404
+
+      # ── gt / lt / gte / lte: 比较 ──
+      - target: body
+        expression: "$.json.version"
+        operator: gte
+        expected: 1
+
+      - target: body
+        expression: "$.json.price"
+        operator: lt
+        expected: 100
+
+      # ── contains: 包含 ──
+      - target: body
+        expression: "$.json.name"
+        operator: contains
+        expected: "API"
+
+      # ── not_contains: 不包含 ──
+      - target: body
+        expression: "$.json.name"
+        operator: not_contains
+        expected: "Error"
+
+      # ── starts_with / ends_with ──
+      - target: body
+        expression: "$.json.name"
+        operator: starts_with
+        expected: "Smart"
+
+      - target: body
+        expression: "$.json.name"
+        operator: ends_with
+        expected: "Test"
+
+      # ── regex: 正则匹配 ──
+      - target: body
+        expression: "$.json.name"
+        operator: regex
+        expected: "^Smart.*Test$"
+
+      # ── in / not_in: 集合判断 ──
+      - target: status_code
+        operator: in
+        expected: [200, 201, 204]
+
+      # ── is_null / is_not_null ──
+      - target: body
+        expression: "$.json.author"
+        operator: is_null
+
+      - target: body
+        expression: "$.json.name"
+        operator: is_not_null
+
+      # ── type_is: 类型检查 ──
+      - target: body
+        expression: "$.json.version"
+        operator: type_is
+        expected: "int"
+
+      - target: body
+        expression: "$.json.active"
+        operator: type_is
+        expected: "bool"
+
+      - target: body
+        expression: "$.json.items"
+        operator: type_is
+        expected: "list"
+
+      # ── length_eq / length_gt / length_lt ──
+      - target: body
+        expression: "$.json.items"
+        operator: length_eq
+        expected: 3
+
+      - target: body
+        expression: "$.json.items"
+        operator: length_gt
+        expected: 0
+
+      # ── header 断言 ──
+      - target: header
+        expression: "Content-Type"
+        operator: contains
+        expected: "application/json"
+
+      # ── 响应时间断言 ──
+      - target: response_time
+        operator: lt
+        expected: 10000
+
+      # ── warning 级别（不影响用例结果） ──
+      - target: response_time
+        operator: lt
+        expected: 100
+        level: warning
+        message: "响应时间超过100ms，注意性能"
+
+      # ── 自定义脚本断言 ──
+      - target: custom
+        script: |
+          data = body.get("json", {})
+          result = "items" in data and len(data["items"]) == 3
+          message = "items 应包含 3 个元素"

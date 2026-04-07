@@ -1,0 +1,86 @@
+# ============================================
+# 示例07：步骤依赖与条件跳过
+# 学习目标：掌握 depends_on 和 skip_if
+# ============================================
+name: "步骤依赖与跳过"
+description: "演示步骤间依赖关系和条件跳过逻辑"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - advanced
+
+variables:
+  run_cleanup: "false"
+
+steps:
+  # ── 步骤1：前置准备 ──
+  - id: "setup"
+    name: "Step1: 环境准备"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        action: "setup"
+    extract:
+      - name: setup_status
+        type: jsonpath
+        expression: "$.args.action"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+
+  # ── 步骤2：依赖步骤1 ──
+  - id: "main_test"
+    name: "Step2: 主测试（依赖 setup）"
+    depends_on:
+      - "setup"
+    request:
+      method: POST
+      url: "/post"
+      body:
+        action: "test"
+        setup_result: "${setup_status}"
+    extract:
+      - name: test_result
+        type: jsonpath
+        expression: "$.json.action"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.setup_result"
+        operator: eq
+        expected: "setup"
+
+  # ── 步骤3：依赖步骤1和步骤2 ──
+  - id: "verify"
+    name: "Step3: 结果验证（依赖 setup + main_test）"
+    depends_on:
+      - "setup"
+      - "main_test"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        verify: "${test_result}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+
+  # ── 步骤4：条件跳过 ──
+  - id: "cleanup"
+    name: "Step4: 清理（仅 run_cleanup=true 时执行）"
+    skip_if:
+      variable: "run_cleanup"
+      operator: "neq"
+      value: "true"
+    request:
+      method: DELETE
+      url: "/delete"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200

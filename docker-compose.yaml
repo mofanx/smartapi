@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  smartapi-web:
+    build: .
+    container_name: smartapi-web
+    ports:
+      - "8100:8100"
+    volumes:
+      - ./testcases:/app/testcases
+      - ./environments:/app/environments
+      - ./reports:/app/reports
+      - ./mock:/app/mock
+    environment:
+      - SMARTAPI_SECRET_KEY=${SMARTAPI_SECRET_KEY:-}
+    restart: unless-stopped
+
+  smartapi-mock:
+    build: .
+    container_name: smartapi-mock
+    command: ["smartapi", "mock-server", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./mock:/app/mock
+    restart: unless-stopped

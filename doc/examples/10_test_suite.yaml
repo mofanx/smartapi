@@ -1,0 +1,88 @@
+# ============================================
+# 示例10：测试套件（多用例组织）
+# 学习目标：用 test_cases 组织多个用例
+# ============================================
+name: "httpbin 接口测试套件"
+description: "组织多个用例为一个测试集"
+variables:
+  base: "https://httpbin.org"
+
+test_cases:
+  # ── 用例1：GET 方法测试 ──
+  - name: "GET 方法验证"
+    tags:
+      - smoke
+    steps:
+      - name: "基础 GET"
+        request:
+          method: GET
+          url: "${base}/get"
+          params:
+            suite: "demo"
+        asserts:
+          - target: status_code
+            operator: eq
+            expected: 200
+
+  # ── 用例2：POST 方法测试 ──
+  - name: "POST 方法验证"
+    tags:
+      - smoke
+    steps:
+      - name: "JSON POST"
+        request:
+          method: POST
+          url: "${base}/post"
+          body:
+            key: "value"
+        asserts:
+          - target: status_code
+            operator: eq
+            expected: 200
+          - target: body
+            expression: "$.json.key"
+            operator: eq
+            expected: "value"
+
+  # ── 用例3：状态码测试 ──
+  - name: "HTTP 状态码验证"
+    tags:
+      - regression
+    steps:
+      - name: "200 OK"
+        request:
+          method: GET
+          url: "${base}/status/200"
+        asserts:
+          - target: status_code
+            operator: eq
+            expected: 200
+
+      - name: "404 Not Found"
+        request:
+          method: GET
+          url: "${base}/status/404"
+        asserts:
+          - target: status_code
+            operator: eq
+            expected: 404
+
+  # ── 用例4：响应头验证 ──
+  - name: "自定义响应头验证"
+    tags:
+      - regression
+    steps:
+      - name: "检查响应头"
+        request:
+          method: GET
+          url: "${base}/response-headers"
+          params:
+            X-Custom: "test_value"
+        asserts:
+          - target: status_code
+            operator: eq
+            expected: 200
+          - target: header
+            expression: "X-Custom"
+            operator: eq
+            expected: "test_value"

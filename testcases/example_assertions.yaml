@@ -1,0 +1,86 @@
+# SmartAPI-Test 示例: 丰富断言演示
+name: "多维度断言测试"
+description: "演示状态码/响应头/响应体/响应时间/脚本等多种断言"
+tags:
+  - assertion
+  - example
+base_url: "https://httpbin.org"
+
+steps:
+  - name: "多维度断言验证"
+    request:
+      method: POST
+      url: "/post"
+      headers:
+        Content-Type: "application/json"
+        X-Custom-Header: "test_value"
+      body:
+        name: "SmartAPI"
+        version: 1
+        items: ["a", "b", "c"]
+        nested:
+          key: "value"
+    asserts:
+      # 状态码断言
+      - target: status_code
+        operator: eq
+        expected: 200
+
+      # 响应头断言
+      - target: header
+        expression: "Content-Type"
+        operator: contains
+        expected: "application/json"
+
+      # 响应体: 等于
+      - target: body
+        expression: "$.json.name"
+        operator: eq
+        expected: "SmartAPI"
+
+      # 响应体: 类型检查
+      - target: body
+        expression: "$.json.version"
+        operator: type_is
+        expected: "int"
+
+      # 响应体: 数组长度
+      - target: body
+        expression: "$.json.items"
+        operator: length_eq
+        expected: 3
+
+      # 响应体: 非空
+      - target: body
+        expression: "$.json.nested.key"
+        operator: is_not_null
+
+      # 响应体: 包含
+      - target: body
+        expression: "$.json.name"
+        operator: contains
+        expected: "API"
+
+      # 响应体: 正则匹配
+      - target: body
+        expression: "$.json.name"
+        operator: regex
+        expected: "^Smart.*$"
+
+      # 响应时间断言 (毫秒)
+      - target: response_time
+        operator: lt
+        expected: 10000
+
+      # 自定义脚本断言
+      - target: custom
+        script: |
+          result = isinstance(body, dict) and "json" in body
+          message = "响应体应包含 json 字段"
+
+      # 警告级别断言 (不影响用例结果)
+      - target: response_time
+        operator: lt
+        expected: 100
+        level: warning
+        message: "响应时间超过100ms，注意性能"

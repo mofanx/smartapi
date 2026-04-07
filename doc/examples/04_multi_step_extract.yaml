@@ -1,0 +1,83 @@
+# ============================================
+# 示例04：多步骤与数据提取
+# 学习目标：掌握步骤间数据传递和 extract 用法
+# ============================================
+name: "多步骤数据流转"
+description: "POST 创建 → 提取数据 → GET 验证，演示跨步骤数据传递"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - multi_step
+  - extract
+
+# 用例级变量
+variables:
+  project_name: "SmartAPI"
+  project_version: "1.0"
+
+steps:
+  # ── 步骤1：创建数据并提取 ──
+  - id: "create"
+    name: "Step1: POST 创建数据"
+    request:
+      method: POST
+      url: "/post"
+      body:
+        name: "${project_name}"
+        version: "${project_version}"
+        created_by: "test_automation"
+    extract:
+      # JSONPath 提取
+      - name: posted_name
+        type: jsonpath
+        expression: "$.json.name"
+
+      - name: posted_version
+        type: jsonpath
+        expression: "$.json.version"
+
+      # Header 提取
+      - name: server_info
+        type: header
+        expression: "Server"
+
+      # JSONPath 提取请求 URL
+      - name: api_url
+        type: jsonpath
+        expression: "$.url"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.name"
+        operator: eq
+        expected: "${project_name}"
+
+  # ── 步骤2：用提取的数据验证 ──
+  - id: "verify"
+    name: "Step2: GET 验证数据"
+    depends_on:
+      - "create"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        name: "${posted_name}"
+        version: "${posted_version}"
+        source_url: "${api_url}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+
+      # 验证提取的变量被正确传递
+      - target: body
+        expression: "$.args.name"
+        operator: eq
+        expected: "${posted_name}"
+
+      - target: body
+        expression: "$.args.version"
+        operator: eq
+        expected: "${posted_version}"

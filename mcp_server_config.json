@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "smartapi-test": {
+      "command": "/home/yan/miniforge3/envs/smartapi/bin/python",
+      "args": ["-m", "smartapi.cli.main", "mcp", "--transport", "stdio"],
+      "cwd": "/home/yan/ubuntu/project/python/apitest"
+    }
+  }
+}

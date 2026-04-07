@@ -1,0 +1,7 @@
+# 生产环境配置
+name: "prod"
+base_url: "https://api.example.com"
+variables:
+  env_name: "production"
+  debug: false
+  timeout: 10

@@ -1,0 +1,73 @@
+# ============================================
+# 示例06：鉴权方式演示
+# 学习目标：掌握 Basic Auth 和 Bearer Token
+# ============================================
+name: "鉴权方式演示"
+description: "演示 Basic Auth 和 Bearer Token 两种常见鉴权"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - auth
+
+steps:
+  # ── Basic Auth ──
+  - id: "basic_auth"
+    name: "Basic Auth 鉴权"
+    request:
+      method: GET
+      url: "/basic-auth/admin/secret123"
+      auth:
+        type: basic
+        username: "admin"
+        password: "secret123"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.authenticated"
+        operator: eq
+        expected: true
+      - target: body
+        expression: "$.user"
+        operator: eq
+        expected: "admin"
+
+  # ── Bearer Token ──
+  - id: "bearer_auth"
+    name: "Bearer Token 鉴权"
+    request:
+      method: GET
+      url: "/bearer"
+      auth:
+        type: bearer
+        token: "my_test_token_abc123"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.authenticated"
+        operator: eq
+        expected: true
+      - target: body
+        expression: "$.token"
+        operator: eq
+        expected: "my_test_token_abc123"
+
+  # ── 手动 Header 方式 ──
+  - id: "manual_header"
+    name: "手动设置 Authorization Header"
+    request:
+      method: GET
+      url: "/headers"
+      headers:
+        Authorization: "Bearer manual_token_xyz"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.headers.Authorization"
+        operator: eq
+        expected: "Bearer manual_token_xyz"

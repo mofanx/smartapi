@@ -1,0 +1,39 @@
+# GitLab CI/CD 示例配置
+stages:
+  - test
+  - report
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+test:
+  stage: test
+  image: python:3.12-slim
+  before_script:
+    - pip install -e ".[dev]"
+  script:
+    - python -m pytest tests/ -v --tb=short --junitxml=report.xml
+    - python -m pytest testcases/ -v --tb=short --junitxml=integration-report.xml
+  artifacts:
+    reports:
+      junit:
+        - report.xml
+        - integration-report.xml
+    when: always
+
+allure-report:
+  stage: report
+  image: python:3.12-slim
+  before_script:
+    - pip install -e ".[dev]"
+  script:
+    - python -m pytest tests/ testcases/ --alluredir=allure-results
+  artifacts:
+    paths:
+      - allure-results
+    when: always
+  allow_failure: true

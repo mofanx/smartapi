@@ -1,0 +1,38 @@
+# SmartAPI-Test 示例: GET 请求测试
+name: "httpbin GET 测试"
+description: "测试 httpbin 的 GET 接口"
+tags:
+  - smoke
+  - example
+base_url: "https://httpbin.org"
+
+steps:
+  - id: "get_test"
+    name: "GET 请求测试"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        name: "SmartAPI"
+        version: "1.0"
+      headers:
+        User-Agent: "SmartAPI-Test/0.1"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.args.name"
+        operator: eq
+        expected: "SmartAPI"
+      - target: body
+        expression: "$.args.version"
+        operator: eq
+        expected: "1.0"
+      - target: response_time
+        operator: lt
+        expected: 5000
+      - target: header
+        expression: "Content-Type"
+        operator: contains
+        expected: "application/json"

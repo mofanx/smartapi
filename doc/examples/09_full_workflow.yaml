@@ -1,0 +1,173 @@
+# ============================================
+# 示例09：完整业务流程（综合演示）
+# 学习目标：综合运用所有功能模拟真实业务
+# ============================================
+name: "用户注册→登录→操作→注销 完整流程"
+description: "综合演示：变量、提取、依赖、断言、动态函数"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - integration
+  - workflow
+priority: "high"
+
+variables:
+  test_user: "user_${random_int()}"
+  test_email: "${random_email()}"
+  test_phone: "${random_phone()}"
+
+steps:
+  # ════════════════════════════════
+  # Phase 1: 用户注册
+  # ════════════════════════════════
+  - id: "register"
+    name: "Phase1: 用户注册"
+    request:
+      method: POST
+      url: "/post"
+      headers:
+        Content-Type: "application/json"
+        X-Request-Id: "${uuid()}"
+      body:
+        action: "register"
+        username: "${test_user}"
+        email: "${test_email}"
+        phone: "${test_phone}"
+        password: "Test@${random_int()}"
+    extract:
+      - name: registered_user
+        type: jsonpath
+        expression: "$.json.username"
+      - name: registered_email
+        type: jsonpath
+        expression: "$.json.email"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.action"
+        operator: eq
+        expected: "register"
+      - target: body
+        expression: "$.json.username"
+        operator: eq
+        expected: "${test_user}"
+      - target: body
+        expression: "$.json.email"
+        operator: contains
+        expected: "@"
+
+  # ════════════════════════════════
+  # Phase 2: 用户登录
+  # ════════════════════════════════
+  - id: "login"
+    name: "Phase2: 用户登录"
+    depends_on:
+      - "register"
+    request:
+      method: POST
+      url: "/post"
+      body:
+        action: "login"
+        username: "${registered_user}"
+        timestamp: "${timestamp()}"
+    extract:
+      - name: login_user
+        type: jsonpath
+        expression: "$.json.username"
+      - name: login_time
+        type: jsonpath
+        expression: "$.json.timestamp"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.username"
+        operator: eq
+        expected: "${registered_user}"
+
+  # ════════════════════════════════
+  # Phase 3: 业务操作 - 查询个人信息
+  # ════════════════════════════════
+  - id: "get_profile"
+    name: "Phase3: 查询个人信息"
+    depends_on:
+      - "login"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        user: "${login_user}"
+        email: "${registered_email}"
+        session_time: "${login_time}"
+      headers:
+        Authorization: "Bearer mock_token_${login_user}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.args.user"
+        operator: eq
+        expected: "${login_user}"
+      - target: body
+        expression: "$.args.email"
+        operator: eq
+        expected: "${registered_email}"
+      - target: response_time
+        operator: lt
+        expected: 5000
+        level: warning
+        message: "个人信息查询超过5秒"
+
+  # ════════════════════════════════
+  # Phase 4: 业务操作 - 更新资料
+  # ════════════════════════════════
+  - id: "update_profile"
+    name: "Phase4: 更新个人资料"
+    depends_on:
+      - "get_profile"
+    request:
+      method: PUT
+      url: "/put"
+      body:
+        action: "update_profile"
+        username: "${login_user}"
+        new_nickname: "Nick_${random_int()}"
+        updated_at: "${now()}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.action"
+        operator: eq
+        expected: "update_profile"
+      - target: body
+        expression: "$.json.username"
+        operator: eq
+        expected: "${login_user}"
+
+  # ════════════════════════════════
+  # Phase 5: 注销
+  # ════════════════════════════════
+  - id: "logout"
+    name: "Phase5: 用户注销"
+    depends_on:
+      - "login"
+    request:
+      method: DELETE
+      url: "/delete"
+      params:
+        action: "logout"
+        user: "${login_user}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.args.action"
+        operator: eq
+        expected: "logout"

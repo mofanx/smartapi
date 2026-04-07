@@ -1,0 +1,45 @@
+# ============================================
+# 示例08：循环与重试
+# 学习目标：掌握 loop 循环和 retry 重试
+# ============================================
+name: "循环与重试演示"
+description: "演示固定次数循环和请求重试机制"
+base_url: "https://httpbin.org"
+tags:
+  - tutorial
+  - advanced
+
+steps:
+  # ── 固定次数循环 ──
+  - name: "批量创建（循环3次）"
+    loop:
+      times: 3
+    request:
+      method: POST
+      url: "/post"
+      body:
+        batch_index: "${loop_index}"
+        item_name: "item_${loop_index}"
+        batch_id: "${uuid()}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+
+  # ── 带重试的请求 ──
+  - name: "请求带重试机制"
+    retry:
+      max_retries: 2
+      retry_interval: 1
+    request:
+      method: GET
+      url: "/get"
+      params:
+        test: "retry_demo"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: response_time
+        operator: lt
+        expected: 10000

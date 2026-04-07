@@ -1,0 +1,56 @@
+# SmartAPI-Test 示例: 多步骤用例
+name: "多步骤接口串联测试"
+description: "演示多步骤用例编排：POST -> 提取数据 -> GET 验证"
+tags:
+  - smoke
+  - multi_step
+base_url: "https://httpbin.org"
+variables:
+  test_user: "smartapi_user"
+  test_email: "${random_email()}"
+
+steps:
+  - id: "post_data"
+    name: "Step1: POST 提交数据"
+    request:
+      method: POST
+      url: "/post"
+      headers:
+        Content-Type: "application/json"
+      body:
+        username: "${test_user}"
+        email: "${test_email}"
+        timestamp: "${timestamp()}"
+    extract:
+      - name: request_url
+        type: jsonpath
+        expression: "$.url"
+      - name: posted_username
+        type: jsonpath
+        expression: "$.json.username"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.json.username"
+        operator: eq
+        expected: "${test_user}"
+
+  - id: "get_verify"
+    name: "Step2: GET 验证数据"
+    depends_on:
+      - "post_data"
+    request:
+      method: GET
+      url: "/get"
+      params:
+        username: "${posted_username}"
+    asserts:
+      - target: status_code
+        operator: eq
+        expected: 200
+      - target: body
+        expression: "$.args.username"
+        operator: eq
+        expected: "${test_user}"
