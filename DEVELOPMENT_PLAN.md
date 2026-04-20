@@ -113,7 +113,30 @@
 - [x] Web 管理与 MCP 集成 (`doc/05-Web管理与MCP.md`)
 - [x] 配套教学示例用例集 (`doc/examples/`)
 
-### Phase 11: 待规划 (后续迭代)
+### Phase 11: CLI 增强 + AI Skills ✅
+> 灵感来源: playwright-cli 模式 — CLI 比 MCP 更经济实用，结合 AI Skills 让项目对任何 AI 工具通用
+
+#### CLI 增强 (smartapi/cli/) - 17 个命令
+- [x] `smartapi generate` - 自然语言描述生成 YAML 测试用例 (输出结构化模板供 AI 完善)
+- [x] `smartapi import-openapi` - 从 OpenAPI/Swagger 文件或 URL 导入并生成用例
+- [x] `smartapi schema` - 输出完整 YAML Schema 参考 (yaml/json/text 三种格式)
+- [x] `smartapi inspect` - 分析用例质量，给出优化建议 (断言缺失/步骤冗余/变量规范)
+- [x] `smartapi analyze` - 分析测试失败原因，输出调试建议
+- [x] `smartapi data` - 生成 Mock 数据 (50+ 类型, --type/--count/--schema/--list-types)
+- [x] `smartapi encrypt` / `smartapi decrypt` - 敏感信息加解密
+- [x] `smartapi env list` / `smartapi env show` - 环境配置管理
+- [x] `smartapi report` - 执行用例并生成 HTML 报告
+- [x] 所有命令输出结构化文本，便于 AI 工具解析
+
+#### AI Skills (skills/) - 6 个文档
+- [x] `skills/smartapi-test.md` - 主 Skill 文件 (frontmatter + 全部 CLI 命令速查 + 工作流)
+- [x] `skills/references/generate-testcase.md` - 从需求/接口文档生成用例工作流
+- [x] `skills/references/import-openapi.md` - OpenAPI 导入与批量生成工作流
+- [x] `skills/references/run-and-debug.md` - 执行测试与调试失败工作流
+- [x] `skills/references/mock-and-data.md` - Mock 数据生成工作流
+- [x] `skills/references/yaml-schema.md` - 完整 YAML Schema 参考文档
+
+### Phase 12: 待规划 (后续迭代)
 - [ ] 定时任务调度
 - [ ] Git 集成 (用例版本管理)
 - [ ] 缺陷管理对接 (Jira/禅道)
@@ -134,6 +157,7 @@
 | test_security.py | 10 | ✅ |
 | Web API 集成验证 | 7 端点 | ✅ |
 | YAML 集成测试 | 2 | ✅ |
+| CLI 命令验证 | 17 命令 | ✅ |
 | **合计** | **145+** | **全部通过** |
 
 ## 变更记录
@@ -143,3 +167,4 @@
 | 2026-03-10 | Web API + 安全加密 + Docker + CI/CD | Phase 8 |
 | 2026-03-10 | React 前端 Web UI 完成 | Phase 9 |
 | 2026-03-10 | 教学文档与示例用例集 | Phase 10 |
+| 2026-04-07 | CLI 增强 (17命令) + AI Skills (6文档) | Phase 11 |
