@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "smartapi-test"
-version = "0.2.0"
+version = "0.3.0"
 description = "智能声明式 API 自动化测试平台"
 readme = "README.md"
 license = {text = "MIT"}
@@ -42,6 +42,7 @@ dev = [
 web = [
     "fastapi>=0.109",
     "uvicorn>=0.27",
+    "apscheduler>=3.10",
 ]
 all = [
     "smartapi-test[dev,web]",

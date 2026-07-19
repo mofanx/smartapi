@@ -161,8 +161,7 @@ def _execute_case_background(
     if not record:
         return
 
-    record.status = "running"
-    record.started_at = datetime.now()
+    record.start()
 
     var_manager = VariableManager()
 
@@ -212,17 +211,14 @@ def _execute_case_background(
         total = len(results)
         passed = sum(1 for r in results if r["success"])
 
-        record.result = {
+        result = {
             "total": total,
             "passed": passed,
             "failed": total - passed,
             "pass_rate": round(passed / total * 100, 1) if total else 0,
             "cases": results,
         }
-        record.status = "completed" if passed == total else "failed"
+        record.complete(result)
 
     except Exception as e:
-        record.status = "failed"
-        record.error = str(e)
-
-    record.finished_at = datetime.now()
+        record.fail(str(e))

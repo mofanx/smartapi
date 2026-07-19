@@ -136,12 +136,23 @@
 - [x] `skills/references/mock-and-data.md` - Mock 数据生成工作流
 - [x] `skills/references/yaml-schema.md` - 完整 YAML Schema 参考文档
 
-### Phase 12: 待规划 (后续迭代)
-- [ ] 定时任务调度
+### Phase 12: 数据持久化与定时调度 ✅
+- [x] SQLite 持久化 (executions/projects/schedules/audit_logs)
+- [x] 定时任务调度器 (`smartapi/scheduler.py`) - APScheduler + CRON
+- [x] 项目/工作空间管理 API
+- [x] 审计日志
+
+### Phase 13: 团队协作 (待规划)
 - [ ] Git 集成 (用例版本管理)
 - [ ] 缺陷管理对接 (Jira/禅道)
-- [ ] 权限与团队协作
+- [ ] 权限与团队协作 (RBAC / SSO)
 - [ ] 分布式执行 (pytest-xdist + 自定义调度)
+
+### Phase 14: 可观测与质量 (待规划)
+- [ ] 指标大盘与趋势分析
+- [ ] 告警规则
+- [ ] Flaky Test 检测
+- [ ] 测试覆盖率关联
 
 ## 测试覆盖
 | 测试模块 | 测试数 | 状态 |
@@ -168,3 +179,4 @@
 | 2026-03-10 | React 前端 Web UI 完成 | Phase 9 |
 | 2026-03-10 | 教学文档与示例用例集 | Phase 10 |
 | 2026-04-07 | CLI 增强 (17命令) + AI Skills (6文档) | Phase 11 |
+| 2026-07-19 | 数据持久化 (SQLite) + 定时调度 + 项目管理 + 前端生产构建修复 | Phase 12 |

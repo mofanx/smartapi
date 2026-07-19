@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from smartapi.web.routers import cases, environments, execution, reports, mock_routes
+from smartapi.web.routers import cases, environments, execution, reports, mock_routes, projects, scheduler
 
 
 @asynccontextmanager
@@ -47,6 +47,8 @@ def create_app() -> FastAPI:
     app.include_router(execution.router, prefix="/api/v1/execution", tags=["执行管理"])
     app.include_router(reports.router, prefix="/api/v1/reports", tags=["报告管理"])
     app.include_router(mock_routes.router, prefix="/api/v1/mock", tags=["Mock管理"])
+    app.include_router(projects.router, prefix="/api/v1/projects", tags=["项目管理"])
+    app.include_router(scheduler.router, prefix="/api/v1/schedules", tags=["定时任务"])
 
     @app.get("/api/v1/health")
     async def health():

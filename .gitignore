@@ -15,5 +15,6 @@ allure-results/
 htmlcov/
 .coverage
 *.log
+data/
 .ruff_cache/
 .mypy_cache/

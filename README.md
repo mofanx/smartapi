@@ -173,6 +173,11 @@ smartapi web --reload
 | `POST /api/v1/reports/generate/{id}` | 生成 HTML 报告 |
 | `GET /api/v1/reports/summary` | 执行汇总统计 |
 | `GET /api/v1/mock/data-factory/types` | 数据工厂类型列表 |
+| `GET /api/v1/projects` | 项目/工作空间列表 |
+| `POST /api/v1/projects` | 创建项目 |
+| `GET /api/v1/schedules` | 定时任务列表 |
+| `POST /api/v1/schedules` | 创建定时任务 |
+| `POST /api/v1/schedules/{id}/run-now` | 立即执行定时任务 |
 
 ### 启动 Mock 服务
 
